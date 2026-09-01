@@ -7,7 +7,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    database_url: str = "sqlite:///./videojuegos.db"
+    database_url: str = "postgresql://neondb_owner:npg_F4fpBHiDWj0K@ep-noisy-rain-axzog8km-pooler.c-4.us-east-2.aws.neon.tech/neondb?sslmode=require"
 
     @property
     def sqlalchemy_url(self) -> str:
@@ -17,7 +17,6 @@ class Settings(BaseSettings):
                 "postgresql+psycopg://",
                 1,
             )
-
         return self.database_url
 
 
