@@ -27,6 +27,16 @@ DATABASE_URL=postgresql://USUARIO:CONTRASENA@HOST/neondb?sslmode=require
 
 La aplicacion convierte automaticamente la URL a `postgresql+psycopg` para SQLAlchemy.
 
+Para ejecutar el CD en GitHub, crea el secreto `NEON_DATABASE_URL` en el
+repositorio con esta misma cadena de conexion de Neon.
+
+Las migraciones se administran con Alembic y los datos iniciales se cargan con:
+
+```powershell
+alembic upgrade head
+python -m scripts.seed
+```
+
 ## Ejecucion
 
 ```powershell
