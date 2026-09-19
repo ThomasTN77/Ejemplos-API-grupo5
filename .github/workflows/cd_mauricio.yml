@@ -1,0 +1,48 @@
+name: CD Mauricio
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - Mauricio/**
+      - .github/workflows/cd_mauricio.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-database:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Mauricio
+    env:
+      DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+    steps:
+      - name: Descargar codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: Mauricio/requirements.txt
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Verificar secreto de Neon
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "Falta configurar el secreto NEON_DATABASE_URL"
+            exit 1
+          fi
+
+      - name: Aplicar migraciones
+        run: alembic upgrade head
+
+      - name: Ejecutar seeders
+        run: python -m src.seeders.seed_libros
