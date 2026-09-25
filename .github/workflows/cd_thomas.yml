@@ -35,14 +35,19 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Verificar secreto de Neon
+        id: neon_secret
         run: |
           if [ -z "$DATABASE_URL" ]; then
-            echo "Falta configurar el secreto NEON_DATABASE_URL"
-            exit 1
+            echo "Falta configurar el secreto NEON_DATABASE_URL. Se omiten migraciones y seed."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Aplicar migraciones
+        if: steps.neon_secret.outputs.configured == 'true'
         run: alembic upgrade head
 
       - name: Ejecutar seeders
+        if: steps.neon_secret.outputs.configured == 'true'
         run: python -m scripts.seed
