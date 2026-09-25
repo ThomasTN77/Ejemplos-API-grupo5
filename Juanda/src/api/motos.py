@@ -28,7 +28,7 @@ def obtener_moto(
 
     if moto is None:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Moto no encontrada",
         )
 
@@ -60,7 +60,7 @@ def actualizar_moto(
 
     if moto is None:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Moto no encontrada",
         )
 
@@ -79,7 +79,7 @@ def eliminar_moto(
 
     if moto is None:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Moto no encontrada",
         )
 
