@@ -37,3 +37,11 @@ jobs:
           pylint src main.py
           --disable=import-error,missing-module-docstring,missing-function-docstring,missing-class-docstring
           --fail-under=8.0
+
+      - name: Ejecutar Pytest
+        if: matrix.project == 'Thomas'
+        run: python -m pytest -q
+
+      - name: Construir imagen Docker
+        if: matrix.project == 'Thomas'
+        run: docker build --tag animales-api:${{ matrix.project }} .

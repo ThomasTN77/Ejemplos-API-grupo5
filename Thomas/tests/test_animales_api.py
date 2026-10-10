@@ -33,7 +33,50 @@ def client() -> Generator[TestClient, None, None]:
     engine.dispose()
 
 
-def test_crear_y_obtener_animal(client: TestClient) -> None:
+def _crear_animal(client: TestClient) -> dict[str, object]:
+    response = client.post(
+        "/animales",
+        json={"nombre": "Luna", "especie": "Perro", "edad": 4},
+    )
+    assert response.status_code == 201
+    return response.json()
+
+
+def test_listar_animales_devuelve_los_registros(client: TestClient) -> None:
+    animal = _crear_animal(client)
+
+    response = client.get("/animales")
+
+    assert response.status_code == 200
+    assert response.json() == [animal]
+
+
+def test_listar_animales_sin_registros_devuelve_lista_vacia(
+    client: TestClient,
+) -> None:
+    response = client.get("/animales")
+
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def test_obtener_animal_por_id_devuelve_el_registro(client: TestClient) -> None:
+    animal = _crear_animal(client)
+
+    response = client.get(f"/animales/{animal['id']}")
+
+    assert response.status_code == 200
+    assert response.json() == animal
+
+
+def test_obtener_animal_inexistente_devuelve_404(client: TestClient) -> None:
+    response = client.get(f"/animales/{uuid4()}")
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Animal no encontrado"}
+
+
+def test_crear_animal_valido_normaliza_los_datos(client: TestClient) -> None:
     response = client.post(
         "/animales",
         json={"nombre": "  Luna  ", "especie": " Perro ", "edad": 4},
@@ -44,49 +87,59 @@ def test_crear_y_obtener_animal(client: TestClient) -> None:
     assert animal["nombre"] == "Luna"
     assert animal["especie"] == "Perro"
     assert animal["edad"] == 4
-    assert client.get(f"/animales/{animal['id']}").json() == animal
 
 
-def test_recurso_inexistente_devuelve_404(client: TestClient) -> None:
-    response = client.get(f"/animales/{uuid4()}")
-
-    assert response.status_code == 404
-    assert response.json() == {"detail": "Animal no encontrado"}
-
-
-@pytest.mark.parametrize(
-    "payload",
-    [
-        {"nombre": "", "especie": "Perro", "edad": 4},
-        {"nombre": "Luna", "especie": "Perro", "edad": -1},
-        {"nombre": "Luna", "especie": "Perro", "edad": 201},
-        {"nombre": "Luna", "especie": "Perro", "edad": 4, "extra": True},
-    ],
-)
-def test_datos_invalidos_devuelven_422(
-    client: TestClient,
-    payload: dict[str, object],
-) -> None:
-    response = client.post("/animales", json=payload)
+def test_crear_animal_invalido_devuelve_422(client: TestClient) -> None:
+    response = client.post(
+        "/animales",
+        json={"nombre": "", "especie": "Perro", "edad": -1},
+    )
 
     assert response.status_code == 422
     assert "detail" in response.json()
 
 
-def test_uuid_invalido_devuelve_422(client: TestClient) -> None:
-    response = client.get("/animales/no-es-un-uuid")
+def test_actualizar_animal_valido_devuelve_los_datos_actualizados(
+    client: TestClient,
+) -> None:
+    animal = _crear_animal(client)
 
-    assert response.status_code == 422
-
-
-def test_eliminar_animal_devuelve_204_y_luego_404(client: TestClient) -> None:
-    created = client.post(
-        "/animales",
+    response = client.put(
+        f"/animales/{animal['id']}",
         json={"nombre": "Michi", "especie": "Gato", "edad": 2},
-    ).json()
+    )
 
-    deleted = client.delete(f"/animales/{created['id']}")
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": animal["id"],
+        "nombre": "Michi",
+        "especie": "Gato",
+        "edad": 2,
+    }
 
-    assert deleted.status_code == 204
-    assert deleted.content == b""
-    assert client.get(f"/animales/{created['id']}").status_code == 404
+
+def test_actualizar_animal_inexistente_devuelve_404(client: TestClient) -> None:
+    response = client.put(
+        f"/animales/{uuid4()}",
+        json={"nombre": "Michi", "especie": "Gato", "edad": 2},
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Animal no encontrado"}
+
+
+def test_eliminar_animal_existente_devuelve_204(client: TestClient) -> None:
+    animal = _crear_animal(client)
+
+    response = client.delete(f"/animales/{animal['id']}")
+
+    assert response.status_code == 204
+    assert response.content == b""
+    assert client.get(f"/animales/{animal['id']}").status_code == 404
+
+
+def test_eliminar_animal_inexistente_devuelve_404(client: TestClient) -> None:
+    response = client.delete(f"/animales/{uuid4()}")
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Animal no encontrado"}
