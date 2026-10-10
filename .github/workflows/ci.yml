@@ -1,8 +1,4 @@
- feat-cicd-maria
-name: CI Pipeline
-=======
 name: CI
- main
 
 on:
   push:
@@ -14,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  # Job para tus compañeros (Juanda y Thomas)
+  # Job para tus compañeros (Juanda, Thomas y Mauricio)
   quality-equipo:
     runs-on: ubuntu-latest
     strategy:
@@ -44,7 +40,14 @@ jobs:
           pylint src main.py
           --disable=import-error,missing-module-docstring,missing-function-docstring,missing-class-docstring
           --fail-under=8.0
- feat-cicd-maria
+
+      - name: Ejecutar Pytest
+        if: matrix.project == 'Thomas'
+        run: python -m pytest -q
+
+      - name: Construir imagen Docker
+        if: matrix.project == 'Thomas'
+        run: docker build --tag animales-api:${{ matrix.project }} .
 
   # Job específico para Maria (tu módulo)
   quality-maria:
@@ -80,5 +83,3 @@ jobs:
       - name: Construir imagen Docker de Maria
         run: |
           docker build -t api-videojuegos:latest Maria/
-=======
- main
