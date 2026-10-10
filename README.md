@@ -10,3 +10,4 @@ ENLACE MARIA: https://youtu.be/n4EuLkp-jUA?si=TZJDvllRORC4HChV
 Examen 3 Links
 ENLACE THOMAS : https://youtu.be/XpMZh7Ew3uo
 ENLACE MARIA: https://youtu.be/ypCyLW9oKPo?si=BWtb8Ax7CrL5ScYr
+ENLACE JUANDA: https://youtube.com/shorts/JrfPAU-BTuc
