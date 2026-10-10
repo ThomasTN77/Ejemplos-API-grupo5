@@ -4,12 +4,22 @@ from pydantic import BaseModel, Field
 
 
 class AnimalCreate(BaseModel):
+    model_config = {
+        "extra": "forbid",
+        "str_strip_whitespace": True,
+    }
+
     nombre: str = Field(min_length=1, max_length=120)
     especie: str = Field(min_length=1, max_length=120)
     edad: int = Field(ge=0, le=200)
 
 
 class AnimalUpdate(BaseModel):
+    model_config = {
+        "extra": "forbid",
+        "str_strip_whitespace": True,
+    }
+
     nombre: str = Field(min_length=1, max_length=120)
     especie: str = Field(min_length=1, max_length=120)
     edad: int = Field(ge=0, le=200)
@@ -21,6 +31,4 @@ class AnimalRead(BaseModel):
     especie: str
     edad: int
 
-    model_config = {
-        "from_attributes": True,
-    }
+    model_config = {"from_attributes": True}
