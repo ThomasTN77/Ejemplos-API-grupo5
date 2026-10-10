@@ -2,6 +2,7 @@ name: CI
 
 on:
   push:
+  pull_request:
     branches: [ "main", "principal", "feat-cicd-maria", "feat-maria" ]
   pull_request:
     branches: [ "main", "principal" ]
@@ -10,6 +11,7 @@ permissions:
   contents: read
 
 jobs:
+  quality:
   # Job para tus compañeros (Juanda, Thomas y Mauricio)
   quality-equipo:
     runs-on: ubuntu-latest
@@ -35,12 +37,40 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt pylint
 
+      - name: Ejecutar pruebas Pytest de motos
+        if: matrix.project == 'Juanda'
+        env:
+          DATABASE_URL: sqlite://
+        run: python -m pytest -q
+
       - name: Ejecutar Pylint
         run: >-
           pylint src main.py
           --disable=import-error,missing-module-docstring,missing-function-docstring,missing-class-docstring
           --fail-under=8.0
 
+      - name: Construir imagen Docker de motos
+        if: matrix.project == 'Juanda'
+        run: docker build --tag api-motos:ci .
+
+      - name: Probar API dentro del contenedor
+        if: matrix.project == 'Juanda'
+        run: |
+          docker run --detach --name api-motos-ci --publish 8000:8000 \
+            --env DATABASE_URL=sqlite:////tmp/motos.db api-motos:ci
+          trap 'docker rm --force api-motos-ci >/dev/null 2>&1 || true' EXIT
+
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8000/ >/dev/null; then
+              curl --fail --silent --show-error http://127.0.0.1:8000/motos
+              exit 0
+            fi
+            if [ "$attempt" -eq 30 ]; then
+              docker logs api-motos-ci
+              exit 1
+            fi
+            sleep 1
+          done
       - name: Ejecutar Pytest
         if: matrix.project == 'Thomas'
         run: python -m pytest -q

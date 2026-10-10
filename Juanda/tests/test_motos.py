@@ -1,18 +1,19 @@
 from uuid import UUID
 
 import pytest
+from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from main import app
+from src.api import motos as motos_api
 from src.database.database import Base, get_db
 
 
-TEST_DATABASE_URL = "sqlite://"
 engine = create_engine(
-    TEST_DATABASE_URL,
+    "sqlite://",
     connect_args={"check_same_thread": False},
     poolclass=StaticPool,
 )
@@ -46,48 +47,94 @@ def moto_valida():
     }
 
 
-def test_crear_y_obtener_moto(client):
-    respuesta = client.post("/motos", json=moto_valida())
+def test_listar_motos_retorna_lista(client):
+    client.post("/motos", json=moto_valida())
 
-    assert respuesta.status_code == 201
-    moto = respuesta.json()
-    assert moto["marca"] == "Honda"
-    assert UUID(moto["id"])
+    respuesta = client.get("/motos")
 
-    respuesta_obtener = client.get(f"/motos/{moto['id']}")
-
-    assert respuesta_obtener.status_code == 200
-    assert respuesta_obtener.json() == moto
+    assert respuesta.status_code == 200
+    assert len(respuesta.json()) == 1
+    assert respuesta.json()[0]["modelo"] == "CB500F"
 
 
-def test_rechaza_datos_invalidos(client):
-    datos = {**moto_valida(), "marca": "   ", "cilindraje": 0}
+def test_listar_motos_maneja_error_del_repositorio(client, monkeypatch):
+    def listar_con_error(_db):
+        raise HTTPException(status_code=503, detail="Base de datos no disponible")
 
-    respuesta = client.post("/motos", json=datos)
+    monkeypatch.setattr(motos_api.repo, "listar", listar_con_error)
 
-    assert respuesta.status_code == 422
-    assert "detail" in respuesta.json()
+    respuesta = client.get("/motos")
+
+    assert respuesta.status_code == 503
+    assert respuesta.json() == {"detail": "Base de datos no disponible"}
 
 
-def test_retorna_404_para_moto_inexistente(client):
+def test_obtener_moto_existente(client):
+    creada = client.post("/motos", json=moto_valida()).json()
+
+    respuesta = client.get(f"/motos/{creada['id']}")
+
+    assert respuesta.status_code == 200
+    assert respuesta.json() == creada
+    assert UUID(respuesta.json()["id"])
+
+
+def test_obtener_moto_inexistente_retorna_404(client):
     respuesta = client.get("/motos/00000000-0000-0000-0000-000000000000")
 
     assert respuesta.status_code == 404
     assert respuesta.json() == {"detail": "Moto no encontrada"}
 
 
-def test_actualiza_y_elimina_moto(client):
+def test_crear_moto_valida(client):
+    respuesta = client.post("/motos", json=moto_valida())
+
+    assert respuesta.status_code == 201
+    assert respuesta.json()["marca"] == "Honda"
+    assert UUID(respuesta.json()["id"])
+
+
+def test_crear_moto_con_datos_invalidos_retorna_422(client):
+    datos = {**moto_valida(), "cilindraje": 0}
+
+    respuesta = client.post("/motos", json=datos)
+
+    assert respuesta.status_code == 422
+    assert respuesta.json()["detail"]
+
+
+def test_actualizar_moto_existente(client):
     creada = client.post("/motos", json=moto_valida()).json()
     datos_actualizados = {**moto_valida(), "modelo": "CB650R"}
 
-    respuesta_actualizar = client.put(
-        f"/motos/{creada['id']}",
-        json=datos_actualizados,
-    )
-    respuesta_eliminar = client.delete(f"/motos/{creada['id']}")
-    respuesta_final = client.get(f"/motos/{creada['id']}")
+    respuesta = client.put(f"/motos/{creada['id']}", json=datos_actualizados)
 
-    assert respuesta_actualizar.status_code == 200
-    assert respuesta_actualizar.json()["modelo"] == "CB650R"
-    assert respuesta_eliminar.status_code == 204
-    assert respuesta_final.status_code == 404
+    assert respuesta.status_code == 200
+    assert respuesta.json()["modelo"] == "CB650R"
+
+
+def test_actualizar_moto_inexistente_retorna_404(client):
+    respuesta = client.put(
+        "/motos/00000000-0000-0000-0000-000000000000",
+        json=moto_valida(),
+    )
+
+    assert respuesta.status_code == 404
+    assert respuesta.json() == {"detail": "Moto no encontrada"}
+
+
+def test_eliminar_moto_existente(client):
+    creada = client.post("/motos", json=moto_valida()).json()
+
+    respuesta = client.delete(f"/motos/{creada['id']}")
+
+    assert respuesta.status_code == 204
+    assert respuesta.content == b""
+    assert client.get(f"/motos/{creada['id']}").status_code == 404
+
+
+def test_eliminar_moto_inexistente_retorna_404(client):
+    respuesta = client.delete("/motos/00000000-0000-0000-0000-000000000000")
+
+    assert respuesta.status_code == 404
+    assert respuesta.json() == {"detail": "Moto no encontrada"}

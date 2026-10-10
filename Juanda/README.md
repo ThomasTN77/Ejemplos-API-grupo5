@@ -48,8 +48,31 @@ Abre <http://127.0.0.1:8000/docs> para probar la documentacion interactiva.
 Para ejecutar las pruebas de validaciones y errores HTTP:
 
 ```powershell
-pytest -q
+python -m pytest -q
 ```
+
+## Docker
+
+Construye la imagen desde esta carpeta:
+
+```powershell
+docker build -t api-motos .
+```
+
+Ejecuta la API con SQLite persistente en un volumen Docker:
+
+```powershell
+docker run --rm -p 8000:8000 -e DATABASE_URL=sqlite:////data/motos.db -v motos_data:/data api-motos
+```
+
+Para usar Neon, configura `DATABASE_URL` en PowerShell y pásala al contenedor:
+
+```powershell
+$env:DATABASE_URL = "postgresql://USUARIO:CONTRASENA@HOST/neondb?sslmode=require"
+docker run --rm -p 8000:8000 -e "DATABASE_URL=$env:DATABASE_URL" api-motos
+```
+
+La API queda disponible en <http://localhost:8000/docs>. El pipeline existente ejecuta las pruebas, construye la imagen y consulta la API dentro del contenedor; las migraciones y los seeders siguen a cargo del workflow de CD.
 
 Los campos `marca` y `modelo` aceptan entre 1 y 80/120 caracteres,
 respectivamente. `cilindraje` debe estar entre 1 y 3000, y `anio` entre 1900 y
@@ -74,3 +97,7 @@ Ejemplo para crear:
   "anio": 2024
 }
 ```
+
+## Video de evidencia
+
+Agregar aqui la URL del video de evidencia correspondiente a esta entrega cuando se publique.
