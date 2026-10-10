@@ -14,6 +14,18 @@ router = APIRouter(
 )
 
 
+def _buscar_o_404(db: Session, animal_id: UUID):
+    animal = repo.obtener_por_id(db, animal_id)
+
+    if animal is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Animal no encontrado",
+        )
+
+    return animal
+
+
 @router.get("", response_model=list[AnimalRead])
 def listar_animales(db: Session = Depends(get_db)):
     return repo.listar(db)
@@ -24,15 +36,7 @@ def obtener_animal(
     animal_id: UUID,
     db: Session = Depends(get_db),
 ):
-    animal = repo.obtener_por_id(db, animal_id)
-
-    if animal is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Animal no encontrado",
-        )
-
-    return animal
+    return _buscar_o_404(db, animal_id)
 
 
 @router.post(
@@ -56,14 +60,7 @@ def actualizar_animal(
     datos: AnimalUpdate,
     db: Session = Depends(get_db),
 ):
-    animal = repo.obtener_por_id(db, animal_id)
-
-    if animal is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Animal no encontrado",
-        )
-
+    animal = _buscar_o_404(db, animal_id)
     return repo.actualizar(db, animal, datos)
 
 
@@ -75,12 +72,5 @@ def eliminar_animal(
     animal_id: UUID,
     db: Session = Depends(get_db),
 ):
-    animal = repo.obtener_por_id(db, animal_id)
-
-    if animal is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Animal no encontrado",
-        )
-
+    animal = _buscar_o_404(db, animal_id)
     repo.eliminar(db, animal)
