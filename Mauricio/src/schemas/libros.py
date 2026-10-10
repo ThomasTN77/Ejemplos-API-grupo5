@@ -9,16 +9,14 @@ class LibroBase(BaseModel):
 
 
 class LibroCreate(LibroBase):
-    """Datos que llegan en el POST."""
+    pass
 
 
 class LibroUpdate(LibroBase):
-    """Datos que llegan en el PUT."""
+    pass
 
 
 class LibroRead(LibroBase):
-    """Datos que devuelve la API."""
-
     id: int
 
     model_config = {"from_attributes": True}

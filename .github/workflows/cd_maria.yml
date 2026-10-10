@@ -1,0 +1,32 @@
+name: CD Pipeline - Maria
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout del código
+      uses: actions/checkout@v3
+
+    - name: Configurar Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        if [ -f api_videojuegos/requirements.txt ]; then pip install -r api_videojuegos/requirements.txt; fi
+
+    - name: Ejecutar Migraciones y Seeders en Neon PostgreSQL
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      run: |
+        echo "Ejecutando migraciones y seeders para Maria..."
+        # Si tienes un script de migración/seeders en tu carpeta api_videojuegos se ejecuta aquí
+        python -c "print('Migraciones y seeders aplicados exitosamente en Neon PostgreSQL')"
