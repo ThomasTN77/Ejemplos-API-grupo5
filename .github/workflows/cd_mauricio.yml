@@ -4,6 +4,13 @@ on:
   push:
     branches:
       - main
+      - feat-cicd-mauricio
+    paths:
+      - Mauricio/**
+      - .github/workflows/cd_mauricio.yml
+  pull_request:
+    branches:
+      - main
     paths:
       - Mauricio/**
       - .github/workflows/cd_mauricio.yml
@@ -13,13 +20,11 @@ permissions:
   contents: read
 
 jobs:
-  deploy-database:
+  pruebas:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: Mauricio
-    env:
-      DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
     steps:
       - name: Descargar codigo
         uses: actions/checkout@v4
@@ -34,6 +39,66 @@ jobs:
       - name: Instalar dependencias
         run: pip install -r requirements.txt
 
+      - name: Ejecutar Pylint
+        run: pylint src main.py tests
+
+      - name: Ejecutar pruebas Pytest
+        env:
+          DATABASE_URL: sqlite://
+        run: python -m pytest
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: pruebas
+    defaults:
+      run:
+        working-directory: Mauricio
+    steps:
+      - name: Descargar codigo
+        uses: actions/checkout@v4
+
+      - name: Construir imagen Docker
+        run: docker build --tag api-libros:${{ github.sha }} .
+
+      - name: Ejecutar pruebas dentro de la imagen
+        run: docker run --rm --env DATABASE_URL=sqlite:// api-libros:${{ github.sha }} python -m pytest
+
+      - name: Levantar la API en el contenedor
+        run: |
+          docker run --detach --name api-libros-ci --publish 8000:8000 \
+            --env DATABASE_URL=sqlite:////tmp/libros.db \
+            api-libros:${{ github.sha }} \
+            sh -c "alembic upgrade head && python -m src.seeders.seed_libros && uvicorn main:app --host 0.0.0.0 --port 8000"
+
+          for intento in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8000/ >/dev/null; then
+              echo "La API respondio dentro del contenedor"
+              curl --fail --silent --show-error http://127.0.0.1:8000/libros
+              exit 0
+            fi
+            sleep 1
+          done
+
+          docker logs api-libros-ci
+          exit 1
+
+      - name: Detener el contenedor
+        if: always()
+        run: docker rm --force api-libros-ci || true
+
+  despliegue:
+    runs-on: ubuntu-latest
+    needs: docker
+    if: github.event_name != 'pull_request'
+    defaults:
+      run:
+        working-directory: Mauricio
+    env:
+      DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+    steps:
+      - name: Descargar codigo
+        uses: actions/checkout@v4
+
       - name: Verificar secreto de Neon
         run: |
           if [ -z "$DATABASE_URL" ]; then
@@ -41,8 +106,11 @@ jobs:
             exit 1
           fi
 
-      - name: Aplicar migraciones
-        run: alembic upgrade head
+      - name: Construir imagen Docker
+        run: docker build --tag api-libros:${{ github.sha }} .
 
-      - name: Ejecutar seeders
-        run: python -m src.seeders.seed_libros
+      - name: Aplicar migraciones con la imagen Docker
+        run: docker run --rm --env DATABASE_URL api-libros:${{ github.sha }} alembic upgrade head
+
+      - name: Ejecutar seeders con la imagen Docker
+        run: docker run --rm --env DATABASE_URL api-libros:${{ github.sha }} python -m src.seeders.seed_libros
