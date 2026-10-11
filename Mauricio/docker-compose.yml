@@ -1,0 +1,9 @@
+services:
+  api-libros:
+    build: .
+    image: api-libros:latest
+    container_name: api-libros
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
