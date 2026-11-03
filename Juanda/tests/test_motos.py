@@ -139,6 +139,25 @@ def test_eliminar_moto_inexistente_retorna_404(client):
     assert respuesta.status_code == 404
     assert respuesta.json() == {"detail": "Moto no encontrada"}
 
+
+@pytest.mark.parametrize(
+    "origin",
+    ["http://localhost:4200", "http://127.0.0.1:4200"],
+)
+def test_preflight_cors_permite_frontend_angular(client, origin):
+    respuesta = client.options(
+        "/motos",
+        headers={
+            "Origin": origin,
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "content-type",
+        },
+    )
+
+    assert respuesta.status_code == 200
+    assert respuesta.headers["access-control-allow-origin"] == origin
+    assert "POST" in respuesta.headers["access-control-allow-methods"]
+
 # =====================================================
 # 1. PRUEBAS PARA GET (LISTAR)
 # =====================================================
@@ -264,5 +283,4 @@ def test_eliminar_moto_exitoso(client):
 def test_eliminar_moto_inexistente(client):
     response = client.delete("/motos/00000000-0000-0000-0000-000000000000")
     assert response.status_code == 404
-
 
