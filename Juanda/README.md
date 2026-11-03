@@ -45,6 +45,20 @@ uvicorn main:app --reload
 
 Abre <http://127.0.0.1:8000/docs> para probar la documentacion interactiva.
 
+### Conexion con el frontend
+
+La aplicacion Angular del repositorio `Frontend-GRUPO5-A-SW` consume esta API
+desde `http://127.0.0.1:8000/motos`. Para probar la conexion en local, inicia
+la API desde esta carpeta y, en otra terminal, inicia el frontend desde su
+carpeta:
+
+```powershell
+npm start
+```
+
+La API permite solicitudes CORS desde `http://localhost:4200` y
+`http://127.0.0.1:4200`, los origenes locales de Angular CLI.
+
 Para ejecutar las pruebas de validaciones y errores HTTP:
 
 ```powershell
