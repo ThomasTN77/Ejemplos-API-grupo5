@@ -10,7 +10,7 @@ from src.schemas.videojuegos import VideojuegoCreate, VideojuegoRead, Videojuego
 
 router = APIRouter(
     prefix="/videojuegos",
-    tags=["videojuegos"],
+    tags=["Videojuegos"],
 )
 
 
