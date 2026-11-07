@@ -16,5 +16,5 @@ ENLACE MAURICIO: https://youtu.be/oXVJOLHrNGk
 Examen 4 Links
 ENLACE THOMAS : https://youtu.be/F5kFS8fU88w?si=Cgc7Jt8JxMfHrLZu
 ENLACE MARIA: https://youtu.be/VA4WJIT1CfE?si=SF0T9VEkQckptUZI
-ENLACE JUANDA: 
+ENLACE JUANDA: https://youtu.be/V9GIt_243sA?si=HPthwXTGm-ytI6BK
 ENLACE MAURICIO: 
