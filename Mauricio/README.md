@@ -26,10 +26,10 @@ python -m src.seeders.seed_libros
 ## Correr la API
 
 ```bash
-uvicorn main:app --reload
+uvicorn main:app --reload --port 8001
 ```
 
-Swagger en http://127.0.0.1:8000/docs
+Swagger en http://127.0.0.1:8001/docs
 
 ## Endpoints
 
