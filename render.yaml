@@ -1,0 +1,56 @@
+services:
+  # Backend del modulo Videojuegos (Maria)
+  - type: web
+    name: api-videojuegos-grupo5
+    runtime: python
+    plan: free
+    rootDir: Maria
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: DATABASE_URL
+        sync: false
+
+  # Backend del modulo Animales (Thomas)
+  - type: web
+    name: api-animales-grupo5
+    runtime: python
+    plan: free
+    rootDir: Thomas
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: DATABASE_URL
+        sync: false
+
+  # Backend del modulo Libros (Mauricio)
+  - type: web
+    name: api-libros-grupo5
+    runtime: python
+    plan: free
+    rootDir: Mauricio
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: DATABASE_URL
+        sync: false
+
+  # Backend del modulo Motos (Juanda)
+  - type: web
+    name: api-motos-grupo5
+    runtime: python
+    plan: free
+    rootDir: Juanda
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: DATABASE_URL
+        sync: false

@@ -23,11 +23,9 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:4200",
-        "http://127.0.0.1:4200",
-    ],
-    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    # Permite que el frontend desplegado en Firebase consuma la API.
+    allow_origins=["*"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
