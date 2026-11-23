@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Guía de entrega — Grupo 5</title>
+<style>
+  @page { size: A4; margin: 14mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1c2833;
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.45;
+  }
+  header {
+    background: linear-gradient(135deg, #0f2744, #1d4e89);
+    color: #fff;
+    padding: 18px 22px;
+    border-radius: 12px;
+  }
+  header h1 { margin: 0 0 4px; font-size: 21px; }
+  header p { margin: 0; color: #d6e4f5; font-size: 11px; }
+  h2 {
+    font-size: 13px;
+    color: #1d4e89;
+    margin: 18px 0 8px;
+    border-bottom: 2px solid #d5dde6;
+    padding-bottom: 4px;
+  }
+  .url-box {
+    background: #e7f6ec;
+    border: 1px solid #b7e1c1;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-top: 12px;
+  }
+  .url-box .etiqueta { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: #1b5e20; font-weight: 700; }
+  .url-box a { color: #0b3d16; font-size: 15px; font-weight: 700; text-decoration: none; word-break: break-all; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { border: 1px solid #d5dde6; padding: 7px 9px; text-align: left; }
+  th { background: #f4f6f8; color: #0f2744; font-size: 10px; text-transform: uppercase; letter-spacing: .5px; }
+  td a { color: #1d4e89; text-decoration: none; word-break: break-all; }
+  .ok { color: #1b5e20; font-weight: 700; }
+  ol { margin: 6px 0 0 18px; padding: 0; }
+  li { margin-bottom: 5px; }
+  .modulos { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    background: #eef3f8; border: 1px solid #d5dde6; border-radius: 20px;
+    padding: 5px 12px; font-weight: 600; color: #0f2744;
+  }
+  .nota {
+    background: #fff8e1; border-left: 4px solid #f0ad4e;
+    padding: 9px 12px; border-radius: 6px; margin-top: 12px;
+  }
+  footer { margin-top: 16px; border-top: 1px solid #d5dde6; padding-top: 8px; color: #64748b; font-size: 9px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Entrega final — API REST Grupo 5</h1>
+  <p>Frontend desplegado en Firebase Hosting · 4 backends en Render · Noviembre 2026</p>
+</header>
+
+<div class="url-box">
+  <div class="etiqueta">URL de la aplicación</div>
+  <a href="https://grupo5-api-frontend.web.app">https://grupo5-api-frontend.web.app</a>
+</div>
+
+<h2>Módulos incluidos</h2>
+<div class="modulos">
+  <span class="chip">Inicio</span>
+  <span class="chip">Animales</span>
+  <span class="chip">Videojuegos</span>
+  <span class="chip">Libros</span>
+  <span class="chip">Motos</span>
+</div>
+
+<h2>Backends publicados (Render)</h2>
+<table>
+  <thead>
+    <tr><th>Módulo</th><th>URL</th><th>Estado</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Videojuegos</td><td><a href="https://api-videojuegos-grupo5.onrender.com">https://api-videojuegos-grupo5.onrender.com</a></td><td class="ok">Activo</td></tr>
+    <tr><td>Animales</td><td><a href="https://api-animales-grupo5.onrender.com">https://api-animales-grupo5.onrender.com</a></td><td class="ok">Activo</td></tr>
+    <tr><td>Libros</td><td><a href="https://api-libros-grupo5.onrender.com">https://api-libros-grupo5.onrender.com</a></td><td class="ok">Activo</td></tr>
+    <tr><td>Motos</td><td><a href="https://api-motos-grupo5.onrender.com">https://api-motos-grupo5.onrender.com</a></td><td class="ok">Activo</td></tr>
+  </tbody>
+</table>
+
+<h2>Cómo verificar en 4 pasos</h2>
+<ol>
+  <li>Abrir <strong>https://grupo5-api-frontend.web.app</strong> en el celular o en el computador.</li>
+  <li>En <strong>Inicio</strong> deben aparecer los 4 módulos con estado <strong>"Conectado"</strong>.</li>
+  <li>Entrar a cada módulo: deben listarse registros de ejemplo y permitir <strong>crear, editar, eliminar y buscar por ID</strong>.</li>
+  <li>Opcional: abrir <code>/docs</code> de cualquier URL de Render para ver la documentación Swagger de la API.</li>
+</ol>
+
+<div class="nota">
+  <strong>Nota:</strong> Render (plan gratuito) duerme los servicios tras ~15 minutos sin uso.
+  La primera petición puede tardar unos 30 segundos. Si al abrir un módulo dice
+  "No hay registros", espere unos segundos y recargue la página.
+</div>
+
+<h2>Repositorio y control de cambios</h2>
+<table>
+  <tbody>
+    <tr><th style="width:120px">Repo del grupo</th><td>https://github.com/ThomasTN77/Ejemplos-API-grupo5</td></tr>
+    <tr><th>Pull request</th><td>https://github.com/ThomasTN77/Ejemplos-API-grupo5/pull/46 — rama <code>entrega-final-grupo5</code> (pendiente de aprobación)</td></tr>
+    <tr><th>Frontend</th><td>https://github.com/ThomasTN77/Frontend-GRUPO5-A-SW</td></tr>
+  </tbody>
+</table>
+
+<footer>
+  Entrega del Grupo 5 — ITM 2026-2 · Archivos de configuración: <code>render.yaml</code>, <code>DESPLIEGUE.md</code> y <code>firebase.json</code> incluidos en el repositorio.
+</footer>
+
+</body>
+</html>

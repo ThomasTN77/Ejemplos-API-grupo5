@@ -4,7 +4,7 @@ Fecha límite: sábado 21 de noviembre de 2026.
 
 ## 1. Backend en Render
 
-El archivo `render.yaml` define dos servicios gratuitos:
+El archivo `render.yaml` define cuatro servicios gratuitos:
 
 | Servicio | Carpeta | Base de datos |
 |---|---|---|
@@ -22,7 +22,7 @@ Pasos:
    ```
    postgresql://neondb_owner:...@ep-noisy-rain-.../neondb?sslmode=require
    ```
-4. Esperar a que ambos servicios digan **Live** (puede tardar 5-10 min la primera vez).
+4. Esperar a que los cuatro servicios digan **Live** (puede tardar 5-10 min la primera vez).
 5. Copiar las URLs que terminen en `.onrender.com` de los cuatro servicios.
 
 Comprobar: abrir `https://<servicio>.onrender.com/docs`. Debe cargar Swagger.
